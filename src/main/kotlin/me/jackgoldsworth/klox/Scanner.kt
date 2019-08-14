@@ -18,8 +18,7 @@ class Scanner(val source: String) {
     }
 
     private fun scanToken() {
-        val char = advance()
-        when(char) {
+        when(advance()) {
             '(' -> addToken(TokenType.LEFT_PAREN)
             ')' -> addToken(TokenType.RIGHT_PAREN)
             '{' -> addToken(TokenType.LEFT_BRACE)
@@ -30,8 +29,30 @@ class Scanner(val source: String) {
             '+' -> addToken(TokenType.PLUS)
             ';' -> addToken(TokenType.SEMICOLON)
             '*' -> addToken(TokenType.STAR)
+            '!' -> addToken(if(match('=')) TokenType.BANG_EQUAL else TokenType.BANG)
+            '=' -> addToken(if(match('=')) TokenType.EQUAL_EQUAL else TokenType.EQUAL)
+            '<' -> addToken(if(match('=')) TokenType.LESS_EQUAL else TokenType.EQUAL)
+            '>' -> addToken(if(match('=')) TokenType.GREATER_EQUAL else TokenType.EQUAL)
+            '/' -> if(match('/')) while(peek() != '\n' && !isEndOfFile()) advance() else addToken(TokenType.SLASH)
             else -> KLox.error(line, "Unexpected character.", "")
         }
+    }
+
+    private fun peek(): Char {
+        if(this.isEndOfFile()) {
+            return '\u0000'
+        }
+        return source[current]
+    }
+
+    private fun match(expected: Char): Boolean {
+        if(isEndOfFile()) {
+            return false
+        }
+        if(source[current] != expected) {
+            return false
+        }
+        return true
     }
 
     private fun advance(): Char {
